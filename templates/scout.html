@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Submit Scout Data</h2>
+<form method="POST">
+    <label>Team Number:</label>
+    <input type="text" name="team_number" required>
+    
+    <label>Match Number:</label>
+    <input type="number" name="match_number" required>
+    
+    <label>Auto Points:</label>
+    <input type="number" name="auto_score" value="0">
+    
+    <label>TeleOp Points:</label>
+    <input type="number" name="teleop_score" value="0">
+    
+    <label>Notes:</label>
+    <textarea name="notes"></textarea>
+    
+    <button type="submit">Save Match</button>
+</form>
+{% endblock %}

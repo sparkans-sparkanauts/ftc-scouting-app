@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTC Sparkanauts Scout</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <style>
+        .nav-links { margin-bottom: 20px; }
+        .nav-links a { margin-right: 15px; text-decoration: none; font-weight: bold; }
+        canvas { touch-action: none; cursor: crosshair; } /* Critical for stylus */
+    </style>
+</head>
+<body>
+    <nav class="nav-links">
+        <a href="/">🏠 Dashboard</a>
+        <a href="/directory">🤖 Team Directory</a>
+        <a href="/schedule">📅 Schedule</a>
+        <a href="/admin">⚙️ Admin</a>
+        <a href="/export">📥 Export JSON</a>
+        <a href="/strategist">Strategy</a>
+    </nav>
+    <hr>
+    {% block content %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Event: {{ event_code }}</h2>
+<a href="/sync" style="background: #333; color: white; padding: 5px; text-decoration: none;">🔄 Sync with FIRST API</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>Match #</th>
+            <th>Red Alliance</th>
+            <th>Blue Alliance</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for match in matches %}
+        <tr>
+            <td>Q-{{ match.match_number }}</td>
+            <td style="color: #e74c3c;">{{ match.red1 }}, {{ match.red2 }}</td>
+            <td style="color: #3498db;">{{ match.blue1 }}, {{ match.blue2 }}</td>
+            <td>
+                <a href="/scout?team={{ match.red1 }}&match={{ match.match_number }}">Scout Red 1</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Settings</h2>
+<form method="POST">
+    <label>Current Event Code (e.g., USCACL):</label>
+    <input type="text" name="event_code" value="{{ config.EVENT_CODE }}">
+    
+    <label>Season (Year):</label>
+    <input type="number" name="season" value="{{ config.SEASON }}">
+    
+    <button type="submit">Update & Save</button>
+</form>
+<p><i>Note: Updating this will restart the background API sync for the new event.</i></p>
+{% endblock %}

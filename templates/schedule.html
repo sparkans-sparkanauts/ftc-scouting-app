@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">Match Schedule & Live Scores</h2>
+        <a href="/sync" style="background: #3498db; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">🔄 Update Scores</a>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; text-align: center;">
+        <thead>
+            <tr style="background: #2c3e50; color: white;">
+                <th style="padding: 15px;">Match</th>
+                <th style="padding: 15px; background: #c0392b;">Red Alliance</th>
+                <th style="padding: 15px; background: #2980b9;">Blue Alliance</th>
+                <th style="padding: 15px;">Score</th>
+                <th style="padding: 15px;">Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in matches %}
+            <tr style="border-bottom: 1px solid #eee; {% if m.completed %}background: #fdfdfd;{% else %}opacity: 0.8;{% endif %}">
+                <td style="padding: 15px; font-weight: bold;">Q-{{ m.match_num }}</td>
+                
+                <td style="padding: 15px; color: #c0392b; font-weight: bold;">
+                    <a href="/team/{{ m.red1 }}" style="color: inherit; text-decoration: none;">{{ m.red1 }}</a> & 
+                    <a href="/team/{{ m.red2 }}" style="color: inherit; text-decoration: none;">{{ m.red2 }}</a>
+                </td>
+
+                <td style="padding: 15px; color: #2980b9; font-weight: bold;">
+                    <a href="/team/{{ m.blue1 }}" style="color: inherit; text-decoration: none;">{{ m.blue1 }}</a> & 
+                    <a href="/team/{{ m.blue2 }}" style="color: inherit; text-decoration: none;">{{ m.blue2 }}</a>
+                </td>
+
+                <td style="padding: 15px; font-size: 1.1em;">
+                    {% if m.completed %}
+                        <span style="color: #c0392b;">{{ m.red_score }}</span> - <span style="color: #2980b9;">{{ m.blue_score }}</span>
+                    {% else %}
+                        <span style="color: #95a5a6;">Scheduled</span>
+                    {% endif %}
+                </td>
+
+                <td style="padding: 15px;">
+                    {% if m.completed %}
+                        {% if m.red_score > m.blue_score %}
+                            <span style="background: #c0392b; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.8em;">RED WIN</span>
+                        {% elif m.blue_score > m.red_score %}
+                            <span style="background: #2980b9; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.8em;">BLUE WIN</span>
+                        {% else %}
+                            <span style="background: #7f8c8d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.8em;">TIE</span>
+                        {% endif %}
+                    {% else %}
+                        <span style="color: #f39c12;">Upcoming</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

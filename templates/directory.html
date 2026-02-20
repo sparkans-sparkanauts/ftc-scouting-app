@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h1 style="margin: 0; color: #2c3e50;">Team Directory</h1>
+        <input type="text" id="teamSearch" onkeyup="filterTeams()" placeholder="Search # or name..." 
+               style="padding: 12px; width: 250px; border-radius: 8px; border: 1px solid #ddd;">
+    </div>
+
+    <div id="teamGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+        {% for team in teams %}
+        <div class="team-card" data-number="{{ team.number }}" data-name="{{ team.name|lower }}" 
+             style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
+            
+            <a href="/team/{{ team.number }}" style="text-decoration: none; color: inherit;">
+                <div style="width: 100%; height: 180px; background: #eee; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    {% if team.photo_path %}
+                        <img src="/static/uploads/{{ team.photo_path }}" 
+                             onerror="this.onerror=null; this.src='/static/logo.png';" 
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <img src="/static/logo.png" 
+                             style="width: 80%; height: 80%; object-fit: contain; opacity: 0.7;">
+                    {% endif %}
+                </div>
+
+                <div style="padding: 15px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: bold; color: #3498db;">#{{ team.number }}</span>
+                        <span style="font-size: 0.8em; color: #666;">OPR: {{ "%.1f"|format(team.opr or 0) }}</span>
+                    </div>
+                    <h3 style="margin: 10px 0; font-size: 1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ team.name or 'Unknown Team' }}
+                    </h3>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function filterTeams() {
+    let input = document.getElementById('teamSearch').value.toLowerCase();
+    let cards = document.getElementsByClassName('team-card');
+    for (let card of cards) {
+        let number = card.getAttribute('data-number');
+        let name = card.getAttribute('data-name');
+        card.style.display = (number.includes(input) || name.includes(input)) ? "" : "none";
+    }
+}
+</script>
+{% endblock %}

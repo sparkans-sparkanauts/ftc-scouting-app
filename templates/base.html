@@ -3,24 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTC Sparkanauts Scout</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <title>{% block title %}FTC DECODE Scouting{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        .nav-links { margin-bottom: 20px; }
-        .nav-links a { margin-right: 15px; text-decoration: none; font-weight: bold; }
-        canvas { touch-action: none; cursor: crosshair; } /* Critical for stylus */
+        :root {
+            --cyber-dark: #0a0e17;
+            --cyber-darker: #060811;
+            --cyber-blue: #00d9ff;
+            --cyber-purple: #b026ff;
+            --cyber-pink: #ff2d95;
+            --cyber-green: #00ff88;
+            --cyber-yellow: #ffdd00;
+            --cyber-gray: #1a1f2e;
+            --cyber-border: #2a3547;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--cyber-darker);
+            color: #f3f4f6;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(176, 38, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 217, 255, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--cyber-dark);
+            border-bottom: 2px solid var(--cyber-border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        nav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--cyber-blue);
+            text-decoration: none;
+            text-shadow: 0 0 20px var(--cyber-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #d1d5db;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background: var(--cyber-gray);
+            color: var(--cyber-blue);
+        }
+
+        .nav-links a.active {
+            background: var(--cyber-blue);
+            color: var(--cyber-darker);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Cyber Card */
+        .cyber-card {
+            background: var(--cyber-dark);
+            border: 1px solid var(--cyber-border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+        }
+
+        .cyber-card:hover {
+            border-color: var(--cyber-blue);
+            box-shadow: 0 4px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        /* Buttons */
+        .cyber-button {
+            background: var(--cyber-blue);
+            color: var(--cyber-darker);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cyber-button:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+
+        .cyber-button:active {
+            transform: scale(0.95);
+        }
+
+        .cyber-button-secondary {
+            background: var(--cyber-gray);
+            color: #f3f4f6;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--cyber-border);
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cyber-button-secondary:hover {
+            border-color: var(--cyber-blue);
+            color: var(--cyber-blue);
+        }
+
+        /* Table */
+        .cyber-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .cyber-table thead {
+            border-bottom: 2px solid var(--cyber-blue);
+        }
+
+        .cyber-table th {
+            text-align: left;
+            padding: 1rem;
+            font-family: 'Orbitron', monospace;
+            color: var(--cyber-blue);
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+        }
+
+        .cyber-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--cyber-border);
+        }
+
+        .cyber-table tbody tr {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .cyber-table tbody tr:hover {
+            background: rgba(26, 31, 46, 0.5);
+        }
+
+        /* Input */
+        .cyber-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--cyber-gray);
+            border: 1px solid var(--cyber-border);
+            border-radius: 0.375rem;
+            color: #f3f4f6;
+            transition: all 0.2s;
+        }
+
+        .cyber-input:focus {
+            outline: none;
+            border-color: var(--cyber-blue);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+
+        .cyber-input::placeholder {
+            color: #6b7280;
+        }
+
+        /* Badge */
+        .cyber-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(0, 217, 255, 0.2);
+            color: var(--cyber-blue);
+        }
+
+        .cyber-badge-green {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--cyber-green);
+        }
+
+        .cyber-badge-pink {
+            background: rgba(255, 45, 149, 0.2);
+            color: var(--cyber-pink);
+        }
+
+        .cyber-badge-purple {
+            background: rgba(176, 38, 255, 0.2);
+            color: var(--cyber-purple);
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        /* Stats Card */
+        .stat-card {
+            background: var(--cyber-dark);
+            border: 1px solid var(--cyber-border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-card .value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .stat-card .label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--cyber-darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--cyber-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cyber-blue);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            nav .container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .cyber-table {
+                font-size: 0.875rem;
+            }
+            
+            .cyber-table td, .cyber-table th {
+                padding: 0.5rem;
+            }
+        }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="nav-links">
-        <a href="/">🏠 Dashboard</a>
-        <a href="/directory">🤖 Team Directory</a>
-        <a href="/schedule">📅 Schedule</a>
-        <a href="/admin">⚙️ Admin</a>
-        <a href="/export">📥 Export JSON</a>
-        <a href="/strategist">Strategy</a>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">
+                <span>⚡</span> FTC DECODE
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" {% if request.path == '/' %}class="active"{% endif %}>Dashboard</a></li>
+                <li><a href="/directory" {% if request.path == '/directory' %}class="active"{% endif %}>Teams</a></li>
+                <li><a href="/schedule" {% if request.path == '/schedule' %}class="active"{% endif %}>Schedule</a></li>
+                <li><a href="/strategist" {% if request.path == '/strategist' %}class="active"{% endif %}>AI Strategist</a></li>
+                <li><a href="/admin" {% if request.path == '/admin' %}class="active"{% endif %}>Admin</a></li>
+            </ul>
+        </div>
     </nav>
-    <hr>
-    {% block content %}{% endblock %}
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

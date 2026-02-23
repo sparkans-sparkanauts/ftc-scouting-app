@@ -1,177 +1,551 @@
 {% extends "base.html" %}
-{% block content %}
 
-<div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px;">
-    <div>
-        <h2 style="margin: 0; color: #2c3e50;">#{{ team.number }} - {{ team.name }}</h2>
-        <p style="margin: 5px 0 0; color: #7f8c8d;">📍 {{ team.city }}, {{ team.state }} | 📈 OPR: {{ "%.2f"|format(team.opr or 0) }}</p>
+{% block title %}Team {{ team.number }} - {{ team.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .team-header {
+        background: linear-gradient(135deg, var(--cyber-dark) 0%, var(--cyber-gray) 100%);
+        border: 2px solid var(--cyber-blue);
+        border-radius: 0.5rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 0 30px rgba(0, 217, 255, 0.2);
+    }
+
+    .team-number {
+        font-family: 'Orbitron', monospace;
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: var(--cyber-blue);
+        text-shadow: 0 0 20px var(--cyber-blue);
+        margin-bottom: 0.5rem;
+    }
+
+    .team-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .team-meta {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        color: #9ca3af;
+        font-size: 0.875rem;
+    }
+
+    .question-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .question-item {
+        background: var(--cyber-gray);
+        border: 1px solid var(--cyber-border);
+        border-radius: 0.375rem;
+        padding: 1rem;
+        transition: all 0.2s;
+    }
+
+    .question-item:hover {
+        border-color: var(--cyber-blue);
+    }
+
+    .question-item input[type="checkbox"] {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-right: 0.75rem;
+        accent-color: var(--cyber-blue);
+        cursor: pointer;
+    }
+
+    .question-item label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .section-header {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.5rem;
+        color: var(--cyber-blue);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--cyber-border);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .photo-upload {
+        border: 2px dashed var(--cyber-border);
+        border-radius: 0.5rem;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .photo-upload:hover {
+        border-color: var(--cyber-blue);
+        background: rgba(0, 217, 255, 0.05);
+    }
+
+    .robot-photo {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    canvas {
+        border: 2px solid var(--cyber-border);
+        border-radius: 0.5rem;
+        cursor: crosshair;
+        background: var(--cyber-darker);
+        width: 100%;
+        max-width: 800px;
+    }
+
+    .drawing-tools {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    .color-btn {
+        width: 40px;
+        height: 40px;
+        border: 2px solid var(--cyber-border);
+        border-radius: 0.375rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .color-btn:hover, .color-btn.active {
+        border-color: var(--cyber-blue);
+        transform: scale(1.1);
+    }
+
+    textarea.cyber-input {
+        min-height: 200px;
+        font-family: 'JetBrains Mono', monospace;
+        resize: vertical;
+    }
+
+    .category-title {
+        font-family: 'Orbitron', monospace;
+        color: var(--cyber-purple);
+        font-size: 1.1rem;
+        margin: 1.5rem 0 0.75rem 0;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="/directory" class="cyber-button-secondary" style="margin-bottom: 1.5rem; display: inline-block;">← Back to Directory</a>
+
+<!-- Team Header -->
+<div class="team-header animate-slide-up">
+    <div class="team-number">#{{ team.number }}</div>
+    <div class="team-name">{{ team.name or 'Team ' + team.number }}</div>
+    <div class="team-meta">
+        {% if team.opr %}
+        <span><strong>OPR:</strong> <span style="color: var(--cyber-purple); font-weight: 600;">{{ "%.2f"|format(team.opr) }}</span></span>
+        {% endif %}
+        {% if team.city %}
+        <span><strong>📍</strong> {{ team.city }}{% if team.state %}, {{ team.state }}{% endif %}</span>
+        {% endif %}
+        {% if team.rookie_year %}
+        <span><strong>Rookie Year:</strong> {{ team.rookie_year }}</span>
+        {% endif %}
     </div>
-    <button onclick="document.getElementById('interview-section').scrollIntoView({behavior: 'smooth'})" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">📝 Go to Interview</button>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 350px; gap: 20px;">
-    
+<div class="grid grid-2">
+    <!-- Left Column: Interview & Photo -->
     <div>
-        <section style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px;">
-            <h3 style="margin-top: 0;">Autonomous Strategy Notebook</h3>
-            <div style="position: relative; display: inline-block; width: 100%;">
-                <canvas id="scoutCanvas" width="600" height="400" style="border: 2px solid #555; background: #eee url('/static/field_bg.png'); background-size: cover; border-radius: 8px; cursor: crosshair; touch-action: none; width: 100%; max-width: 600px;"></canvas>
-                <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
-                    <button onclick="setTool('pen')" style="padding: 8px 15px;">🖊️ Pen</button>
-                    <button onclick="setTool('eraser')" style="padding: 8px 15px;">🧽 Eraser</button>
-                    <input type="color" id="colorPicker" value="#ff0000" style="height: 35px; width: 50px; border: none;">
-                    <button onclick="clearCanvas()" style="padding: 8px 15px;">🗑️ Clear</button>
-                    <button id="saveBtn" onclick="saveDrawing()" style="background-color: #2ecc71; color: white; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: auto;">💾 Save Drawing</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="interview-section" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-            <h3 style="margin-top: 0;">Team Interview (2025 DECODE Season)</h3>
-            <form action="/save_interview" method="POST">
+        <!-- DECODE 2025-2026 Interview Questions -->
+        <div class="cyber-card animate-slide-up" style="animation-delay: 0.1s;">
+            <h2 class="section-header">📋 DECODE Scouting Checklist</h2>
+            
+            <form method="POST" action="/save_interview">
                 <input type="hidden" name="team_num" value="{{ team.number }}">
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    {% set questions = [
-                        "Consistent Auto?", "Preloaded Element?", "Park in Auto?", "High Basket Capable?",
-                        "Sample to Net?", "Multi-Sample Auto?", "AprilTag Alignment?", "Drivetrain: 4-Motor?",
-                        "Drivetrain: Mecanum?", "Intake: Active Roller?", "Intake: Claw/Grabber?", "Outtake: Slides?",
-                        "Outtake: Linkage?", "Can score High?", "Can score Mid?", "Can score Low?",
-                        "Holds 2 Samples?", "Anti-Tip Mechanism?", "Fast Cycle Time?", "Color Sensor used?",
-                        "Endgame: Level 1 Ascent?", "Endgame: Level 2 Ascent?", "Endgame: Level 3 Ascent?", 
-                        "Endgame: Fast Ascent?", "Submersible Expert?"
-                    ] %}
-
-                    {# Parse existing JSON answers if they exist #}
-                    {% set current_answers = interview.answers|from_json if interview and interview.answers else {} %}
-
-                    {% for q in questions %}
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee;">
-                        <span style="font-size: 0.9em; font-weight: 500;">{{ q }}</span>
-                        <input type="hidden" name="q{{ loop.index }}_text" value="{{ q }}">
-                        <label class="switch">
-                            <input type="checkbox" name="q{{ loop.index }}" value="Yes" 
-                                   {% if current_answers.get(q) == 'Yes' %}checked{% endif %}>
-                            <span class="slider round"></span>
+                <div class="question-grid">
+                    <h3 class="category-title" style="grid-column: 1 / -1;">🤖 Autonomous Period</h3>
+                    
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q1" value="Yes" {% if interview and 'Reliable auto routine' in interview.answers|from_json and interview.answers|from_json['Reliable auto routine'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q1_text" value="Reliable auto routine">
+                            Reliable auto routine
                         </label>
                     </div>
-                    {% endfor %}
+                    
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q2" value="Yes" {% if interview and 'Scores artifacts in auto' in interview.answers|from_json and interview.answers|from_json['Scores artifacts in auto'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q2_text" value="Scores artifacts in auto">
+                            Scores artifacts in auto
+                        </label>
+                    </div>
+                    
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q3" value="Yes" {% if interview and 'Clears classifier in auto' in interview.answers|from_json and interview.answers|from_json['Clears classifier in auto'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q3_text" value="Clears classifier in auto">
+                            Clears classifier in auto
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q4" value="Yes" {% if interview and 'MOTIF pattern detection' in interview.answers|from_json and interview.answers|from_json['MOTIF pattern detection'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q4_text" value="MOTIF pattern detection">
+                            MOTIF pattern detection
+                        </label>
+                    </div>
+
+                    <h3 class="category-title" style="grid-column: 1 / -1;">🎯 TeleOp Scoring</h3>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q5" value="Yes" {% if interview and 'Fast artifact cycles (<8s)' in interview.answers|from_json and interview.answers|from_json['Fast artifact cycles (<8s)'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q5_text" value="Fast artifact cycles (<8s)">
+                            Fast artifact cycles (<8s)
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q6" value="Yes" {% if interview and 'Accurate goal scoring' in interview.answers|from_json and interview.answers|from_json['Accurate goal scoring'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q6_text" value="Accurate goal scoring">
+                            Accurate goal scoring
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q7" value="Yes" {% if interview and 'Can form MOTIF patterns' in interview.answers|from_json and interview.answers|from_json['Can form MOTIF patterns'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q7_text" value="Can form MOTIF patterns">
+                            Can form MOTIF patterns
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q8" value="Yes" {% if interview and 'Consistent launcher/shooter' in interview.answers|from_json and interview.answers|from_json['Consistent launcher/shooter'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q8_text" value="Consistent launcher/shooter">
+                            Consistent launcher/shooter
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q9" value="Yes" {% if interview and 'Effective gate operation' in interview.answers|from_json and interview.answers|from_json['Effective gate operation'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q9_text" value="Effective gate operation">
+                            Effective gate operation
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q10" value="Yes" {% if interview and 'Handles classifier well' in interview.answers|from_json and interview.answers|from_json['Handles classifier well'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q10_text" value="Handles classifier well">
+                            Handles classifier well
+                        </label>
+                    </div>
+
+                    <h3 class="category-title" style="grid-column: 1 / -1;">⏱️ Endgame</h3>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q11" value="Yes" {% if interview and 'Consistent BASE zone parking' in interview.answers|from_json and interview.answers|from_json['Consistent BASE zone parking'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q11_text" value="Consistent BASE zone parking">
+                            Consistent BASE zone parking
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q12" value="Yes" {% if interview and 'Quick endgame transition' in interview.answers|from_json and interview.answers|from_json['Quick endgame transition'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q12_text" value="Quick endgame transition">
+                            Quick endgame transition
+                        </label>
+                    </div>
+
+                    <h3 class="category-title" style="grid-column: 1 / -1;">⚙️ Robot Capabilities</h3>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q13" value="Yes" {% if interview and 'Skilled driver(s)' in interview.answers|from_json and interview.answers|from_json['Skilled driver(s)'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q13_text" value="Skilled driver(s)">
+                            Skilled driver(s)
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q14" value="Yes" {% if interview and 'Fast/agile drivetrain' in interview.answers|from_json and interview.answers|from_json['Fast/agile drivetrain'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q14_text" value="Fast/agile drivetrain">
+                            Fast/agile drivetrain
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q15" value="Yes" {% if interview and 'Reliable intake mechanism' in interview.answers|from_json and interview.answers|from_json['Reliable intake mechanism'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q15_text" value="Reliable intake mechanism">
+                            Reliable intake mechanism
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q16" value="Yes" {% if interview and 'Minimal breakdowns' in interview.answers|from_json and interview.answers|from_json['Minimal breakdowns'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q16_text" value="Minimal breakdowns">
+                            Minimal breakdowns
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q17" value="Yes" {% if interview and 'Can control 3+ artifacts' in interview.answers|from_json and interview.answers|from_json['Can control 3+ artifacts'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q17_text" value="Can control 3+ artifacts">
+                            Can control 3+ artifacts
+                        </label>
+                    </div>
+
+                    <h3 class="category-title" style="grid-column: 1 / -1;">🤝 Team Quality</h3>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q18" value="Yes" {% if interview and 'Good communication' in interview.answers|from_json and interview.answers|from_json['Good communication'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q18_text" value="Good communication">
+                            Good communication
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q19" value="Yes" {% if interview and 'Adapts strategy mid-match' in interview.answers|from_json and interview.answers|from_json['Adapts strategy mid-match'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q19_text" value="Adapts strategy mid-match">
+                            Adapts strategy mid-match
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q20" value="Yes" {% if interview and 'Quick pit repairs' in interview.answers|from_json and interview.answers|from_json['Quick pit repairs'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q20_text" value="Quick pit repairs">
+                            Quick pit repairs
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q21" value="Yes" {% if interview and 'Gracious professionalism' in interview.answers|from_json and interview.answers|from_json['Gracious professionalism'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q21_text" value="Gracious professionalism">
+                            Gracious professionalism
+                        </label>
+                    </div>
+
+                    <h3 class="category-title" style="grid-column: 1 / -1;">🏆 Alliance Selection</h3>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q22" value="Yes" {% if interview and 'Captain material' in interview.answers|from_json and interview.answers|from_json['Captain material'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q22_text" value="Captain material">
+                            Captain material
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q23" value="Yes" {% if interview and 'Top alliance pick' in interview.answers|from_json and interview.answers|from_json['Top alliance pick'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q23_text" value="Top alliance pick">
+                            Top alliance pick
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q24" value="Yes" {% if interview and 'Complements our strategy' in interview.answers|from_json and interview.answers|from_json['Complements our strategy'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q24_text" value="Complements our strategy">
+                            Complements our strategy
+                        </label>
+                    </div>
+
+                    <div class="question-item">
+                        <label>
+                            <input type="checkbox" name="q25" value="Yes" {% if interview and 'Would pick again' in interview.answers|from_json and interview.answers|from_json['Would pick again'] == 'Yes' %}checked{% endif %}>
+                            <input type="hidden" name="q25_text" value="Would pick again">
+                            Would pick again
+                        </label>
+                    </div>
                 </div>
 
-                <div style="margin-top: 20px;">
-                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">General Scouting Notes:</label>
-                    <textarea name="notes" rows="4" style="width: 100%; border-radius: 8px; border: 1px solid #ddd; padding: 10px; font-family: inherit;">{{ interview.notes if interview else '' }}</textarea>
-                </div>
-                
-                <button type="submit" style="margin-top: 20px; width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em;">💾 Save All Interview Data</button>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Additional Notes:</label>
+                <textarea name="notes" class="cyber-input" placeholder="Detailed observations, strategies, strengths, weaknesses...">{{ interview.notes if interview else '' }}</textarea>
+
+                <button type="submit" class="cyber-button" style="margin-top: 1rem; width: 100%;">💾 Save Interview</button>
             </form>
-        </section>
+        </div>
+
+        <!-- Robot Photo Upload -->
+        <div class="cyber-card" style="margin-top: 1.5rem;">
+            <h2 class="section-header">📸 Robot Photo</h2>
+            {% if team.photo_path %}
+                <img src="{{ url_for('static', filename='uploads/' + team.photo_path) }}" class="robot-photo" alt="Robot Photo">
+            {% else %}
+                <form method="POST" action="/upload_photo" enctype="multipart/form-data">
+                    <input type="hidden" name="team_num" value="{{ team.number }}">
+                    <div class="photo-upload">
+                        <input type="file" name="photo" accept="image/*" class="cyber-input" required>
+                        <p style="margin-top: 1rem; color: #9ca3af;">Upload a photo of the robot</p>
+                    </div>
+                    <button type="submit" class="cyber-button" style="margin-top: 1rem; width: 100%;">Upload Photo</button>
+                </form>
+            {% endif %}
+        </div>
     </div>
 
+    <!-- Right Column: Drawing Canvas -->
     <div>
-        <section style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 20px;">
-            <h3 style="margin-top: 0;">Robot Photo</h3>
-            <div style="width: 100%; aspect-ratio: 1/1; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 10px; background: #fafafa;">
-                {% if team.photo_path %}
-                    <img src="/static/uploads/{{ team.photo_path }}" 
-                         onerror="this.src='/static/logo.png';" 
-                         style="width: 100%; height: 100%; object-fit: cover;">
-                {% else %}
-                    <img src="/static/logo.png" style="width: 70%; opacity: 0.5;">
-                {% endif %}
-            </div>
+        <div class="cyber-card animate-slide-up" style="animation-delay: 0.2s;">
+            <h2 class="section-header">🎨 Strategy Canvas</h2>
             
-            <form action="/upload_photo" method="POST" enctype="multipart/form-data" style="margin-top: 15px;">
-                <input type="hidden" name="team_num" value="{{ team.number }}">
-                <input type="file" name="photo" accept="image/*" capture="environment" style="width: 100%; margin-bottom: 10px; font-size: 0.8em;">
-                <button type="submit" style="width: 100%; background: #34495e; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">📤 Upload Photo</button>
-            </form>
-        </section>
+            <div class="drawing-tools">
+                <button class="color-btn active" style="background: #ef4444;" data-color="#ef4444" title="Red Alliance"></button>
+                <button class="color-btn" style="background: #3b82f6;" data-color="#3b82f6" title="Blue Alliance"></button>
+                <button class="color-btn" style="background: #eab308;" data-color="#eab308" title="Yellow"></button>
+                <button class="color-btn" style="background: #22c55e;" data-color="#22c55e" title="Green"></button>
+                <button class="color-btn" style="background: #a855f7;" data-color="#a855f7" title="Purple"></button>
+                <button class="color-btn" style="background: #ffffff;" data-color="#ffffff" title="White"></button>
+                
+                <button class="cyber-button-secondary" onclick="clearCanvas()">🗑️ Clear</button>
+                <button class="cyber-button" onclick="saveDrawing()">💾 Save Drawing</button>
+            </div>
+
+            <canvas id="drawingCanvas" width="800" height="600"></canvas>
+        </div>
     </div>
 </div>
 
-<style>
-    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-    input:checked + .slider { background-color: #27ae60; }
-    input:checked + .slider:before { transform: translateX(20px); }
-    hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
-</style>
-
 <script>
-    const canvas = document.getElementById('scoutCanvas');
+    const canvas = document.getElementById('drawingCanvas');
     const ctx = canvas.getContext('2d');
-    let drawing = false;
-    let mode = 'pen';
+    let isDrawing = false;
+    let currentColor = '#ef4444';
+    let lastX = 0;
+    let lastY = 0;
 
-    // Set canvas internal resolution to match displayed size
-    function resizeCanvas() {
-        const rect = canvas.getBoundingClientRect();
-        // Only set if size is significantly different to prevent clearing on scroll
-    }
-
+    // Load existing drawing
     {% if drawing %}
         const img = new Image();
-        img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        img.src = "{{ drawing.image_data|safe }}";
+        img.onload = () => ctx.drawImage(img, 0, 0);
+        img.src = '{{ drawing.image_data }}';
+    {% else %}
+        // Draw grid
+        ctx.strokeStyle = '#2a3547';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < canvas.width; i += 50) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.stroke();
+        }
+        for (let i = 0; i < canvas.height; i += 50) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(canvas.width, i);
+            ctx.stroke();
+        }
     {% endif %}
 
-    canvas.addEventListener('mousedown', start);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', stop);
-    canvas.addEventListener('touchstart', (e) => { start(e.touches[0]); e.preventDefault(); }, {passive: false});
-    canvas.addEventListener('touchmove', (e) => { draw(e.touches[0]); e.preventDefault(); }, {passive: false});
-    canvas.addEventListener('touchend', stop);
+    // Color selection
+    document.querySelectorAll('.color-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentColor = this.dataset.color;
+        });
+    });
 
-    function start(e) { drawing = true; draw(e); }
-    function stop() { drawing = false; ctx.beginPath(); }
+    // Drawing functions
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+    });
 
-    function setTool(t) { mode = t; }
-    function clearCanvas() { if(confirm("Clear this drawing?")) ctx.clearRect(0, 0, canvas.width, canvas.height); }
-
-    function draw(e) {
-        if (!drawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-
-        ctx.lineWidth = mode === 'eraser' ? 25 : 4;
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = 3;
         ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        
-        if (mode === 'eraser') {
-            ctx.globalCompositeOperation = 'destination-out';
-        } else {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.strokeStyle = document.getElementById('colorPicker').value;
-        }
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+    });
 
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseout', () => isDrawing = false);
+
+    // Touch support
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        lastX = touch.clientX - rect.left;
+        lastY = touch.clientY - rect.top;
+        isDrawing = true;
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+        
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
         ctx.lineTo(x, y);
         ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
+        [lastX, lastY] = [x, y];
+    });
+
+    canvas.addEventListener('touchend', () => isDrawing = false);
+
+    function clearCanvas() {
+        if (confirm('Clear the canvas?')) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0a0e17';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
     }
 
-    async function saveDrawing() {
-        const btn = document.getElementById('saveBtn');
-        const oldText = btn.innerText;
-        btn.innerText = "Saving...";
+    function saveDrawing() {
         const dataURL = canvas.toDataURL();
-        try {
-            await fetch('/save_drawing', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ team_num: "{{ team.number }}", image: dataURL })
-            });
-            btn.innerText = "✅ Saved!";
-        } catch (e) {
-            btn.innerText = "❌ Error";
-        }
-        setTimeout(() => btn.innerText = oldText, 2000);
+        fetch('/save_drawing', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({team_num: '{{ team.number }}', image: dataURL})
+        }).then(() => alert('✅ Drawing saved!'));
     }
 </script>
 {% endblock %}
